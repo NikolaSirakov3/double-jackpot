@@ -34,6 +34,15 @@ export function reelMotion(elapsed, reel, reducedMotion = false) {
   };
 }
 
+export function downwardReelTile(position, travel, row) {
+  const base = Math.floor(position);
+  const fraction = position - base;
+  return {
+    tapeIndex: travel - base + row,
+    yInCells: row + fraction,
+  };
+}
+
 export function screenFromStops(stops) {
   return Array.from({ length: 3 }, (_, row) =>
     Array.from({ length: 3 }, (_, reel) => {

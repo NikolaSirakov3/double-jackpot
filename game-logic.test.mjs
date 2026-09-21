@@ -7,6 +7,7 @@ import {
   evaluateScreen,
   createSpinOutcome,
   reelMotion,
+  downwardReelTile,
 } from './game-logic.js';
 
 test('seeded random generator repeats the same sequence', () => {
@@ -75,4 +76,12 @@ test('reel motion scrolls continuously and lands each reel at a staggered exact 
   assert.deepEqual(firstLanded, { position: 12, settled: true, stopAt: 800 });
   assert.equal(secondStillMoving.settled, false);
   assert.deepEqual(finalLanded, { position: 18, settled: true, stopAt: 1240 });
+});
+
+test('reel tiles travel downward while the next symbol enters from above', () => {
+  assert.deepEqual(downwardReelTile(0, 12, 0), { tapeIndex: 12, yInCells: 0 });
+  assert.deepEqual(downwardReelTile(0.25, 12, 0), { tapeIndex: 12, yInCells: 0.25 });
+  assert.deepEqual(downwardReelTile(0.25, 12, -1), { tapeIndex: 11, yInCells: -0.75 });
+  assert.deepEqual(downwardReelTile(1.25, 12, 0), { tapeIndex: 11, yInCells: 0.25 });
+  assert.deepEqual(downwardReelTile(12, 12, 0), { tapeIndex: 0, yInCells: 0 });
 });

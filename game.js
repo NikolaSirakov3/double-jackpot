@@ -1,5 +1,5 @@
 import { STR } from './strings.js';
-import { CONFIG, PAYLINES, createRng, createSpinOutcome, reelMotion, screenFromStops } from './game-logic.js';
+import { CONFIG, PAYLINES, createRng, createSpinOutcome, downwardReelTile, reelMotion, screenFromStops } from './game-logic.js';
 
 const canvas = document.querySelector('#game');
 const ctx = canvas.getContext('2d', { alpha: false });
@@ -224,10 +224,10 @@ function spin(force = null) {
   state.outcome = createSpinOutcome(random, bet, fixture);
   state.spinTapes = Array.from({ length: 3 }, (_, reel) => {
     const travel = reelMotion(Infinity, reel, state.reducedMotion).position;
-    const tape = Array.from({ length: travel + 4 }, () => 1 + Math.floor(visualRandom() * 8));
+    const tape = Array.from({ length: travel + 3 }, () => 1 + Math.floor(visualRandom() * 8));
     for (let row = 0; row < 3; row += 1) {
-      tape[row] = state.display[row][reel];
-      tape[travel + row] = state.outcome.screen[row][reel];
+      tape[row] = state.outcome.screen[row][reel];
+      tape[travel + row] = state.display[row][reel];
     }
     return tape;
   });
@@ -459,7 +459,7 @@ function drawSymbolTile(l, reel, y, symbol, moving = false) {
   tile.addColorStop(1, '#02030e');
   ctx.fillStyle = tile;
   ctx.fillRect(x, y, l.cell, l.cell);
-  const pad = l.cell * 0.065;
+  const pad = l.cell * 0.135;
   if (assets.symbols[symbol]) ctx.drawImage(assets.symbols[symbol], x + pad, y + pad, l.cell - pad * 2, l.cell - pad * 2);
   if (moving) {
     const streak = ctx.createLinearGradient(0, y, 0, y + l.cell);
@@ -492,16 +492,16 @@ function drawReel(l, reel) {
   }
 
   const step = l.cell + l.gap;
-  const base = Math.floor(motion.position);
-  const fraction = motion.position - base;
+  const travel = reelMotion(Infinity, reel, state.reducedMotion).position;
   const x = l.gridX + reel * step;
   ctx.save();
   ctx.beginPath();
   ctx.rect(x - 3, l.gridY - 3, l.cell + 6, l.gridSize + 6);
   ctx.clip();
   for (let row = -1; row <= 3; row += 1) {
-    const tapeIndex = Math.max(0, Math.min(state.spinTapes[reel].length - 1, base + row));
-    drawSymbolTile(l, reel, l.gridY + (row - fraction) * step, state.spinTapes[reel][tapeIndex], true);
+    const tile = downwardReelTile(motion.position, travel, row);
+    const tapeIndex = Math.max(0, Math.min(state.spinTapes[reel].length - 1, tile.tapeIndex));
+    drawSymbolTile(l, reel, l.gridY + tile.yInCells * step, state.spinTapes[reel][tapeIndex], true);
   }
   ctx.restore();
 }
