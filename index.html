@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="theme-color" content="#050414">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><text y=%2254%22 font-size=%2252%22>🎰</text></svg>">
+  <title></title>
+  <style>
+    :root { color-scheme: dark; font-family: Impact, Haettenschweiler, "Arial Narrow Bold", system-ui, sans-serif; }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #050414; touch-action: manipulation; }
+    body { user-select: none; }
+    canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+    #controls { position: fixed; left: 50%; bottom: max(12px, env(safe-area-inset-bottom)); transform: translateX(-50%); display: flex; gap: 8px; align-items: center; justify-content: center; width: min(96vw, 760px); z-index: 3; }
+    button { min-height: 46px; border: 2px solid #25e6ff; border-radius: 13px; padding: 0 16px; color: #e7fbff; background: linear-gradient(#25105a, #08061d); box-shadow: 0 3px 0 #02020b, 0 0 14px #25e6ff66, inset 0 0 14px #8d38ff88; font: 700 14px/1 system-ui, sans-serif; letter-spacing: .06em; cursor: pointer; }
+    button:hover { filter: brightness(1.15); }
+    button:focus-visible { outline: 3px solid #6be9ff; outline-offset: 2px; }
+    button:disabled { opacity: .45; cursor: default; filter: grayscale(.35); }
+    #spin { min-width: 154px; min-height: 62px; border-radius: 31px; border-color: #ffb6ed; background: radial-gradient(circle at 50% 24%, #ff8bde 0, #ff2db7 34%, #7c1cff 78%); color: #fff; text-shadow: 0 0 8px #fff; box-shadow: 0 5px 0 #390061, 0 0 28px #ff2db7, 0 0 44px #25e6ff55, inset 0 0 13px #ffd8f4; font-size: 23px; }
+    .small { min-width: 52px; padding: 0 10px; }
+    #modal { position: fixed; inset: 0; z-index: 8; display: none; align-items: center; justify-content: center; padding: 18px; background: rgba(2, 2, 14, .88); backdrop-filter: blur(8px); }
+    #modal.open { display: flex; }
+    .card { width: min(760px, 96vw); max-height: 90vh; overflow: auto; border: 3px solid #ff2db7; border-radius: 22px; padding: 22px; background: linear-gradient(160deg, #25105a, #050414); box-shadow: 0 0 60px #000, 0 0 36px #ff2db777, inset 0 0 40px #391076; color: #e7fbff; font: 500 15px/1.45 system-ui, sans-serif; }
+    .card h2 { margin: 0 0 12px; color: #ff72d3; text-shadow: 0 0 12px #ff2db7; font: 900 27px/1 Impact, sans-serif; letter-spacing: .08em; text-align: center; }
+    .card p { margin: 10px 0; }
+    .paygrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 18px 0; }
+    .payitem { border: 1px solid #25e6ff; border-radius: 12px; padding: 8px; text-align: center; background: #070721; box-shadow: inset 0 0 14px #25e6ff22; }
+    .payitem img { width: min(100%, 108px); border-radius: 10px; display: block; margin: auto; }
+    .payitem b { display: block; color: #ff72d3; font-size: 13px; margin-top: 5px; }
+    .payitem span { color: #fff; font-weight: 800; }
+    .setting { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid #51238c; padding: 12px 0; }
+    #modalActions { display: flex; justify-content: center; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+    #qaPanel { position: fixed; right: 12px; top: 12px; z-index: 5; display: none; width: 190px; padding: 10px; border: 1px solid #58e8ff; border-radius: 12px; background: rgba(5, 14, 18, .9); color: #dffcff; font: 700 11px/1.4 system-ui, sans-serif; }
+    #qaPanel.open { display: grid; gap: 7px; }
+    #qaPanel button { border-color: #58e8ff; min-height: 36px; font-size: 11px; background: #08202a; box-shadow: none; }
+    #live { position: fixed; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    #dev { display: none; position: fixed; left: 6px; top: 6px; z-index: 10; padding: 5px 7px; color: #6cff7a; background: #001a07cc; font: 12px/1.35 monospace; white-space: pre; pointer-events: none; }
+    @media (max-width: 700px) {
+      #controls { gap: 5px; bottom: max(7px, env(safe-area-inset-bottom)); }
+      button { min-height: 40px; padding: 0 9px; font-size: 10px; }
+      #spin { min-width: 105px; min-height: 54px; font-size: 18px; }
+      #auto { display: none; }
+      .paygrid { grid-template-columns: repeat(2, 1fr); }
+      .card { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="game" role="img"></canvas>
+  <div id="controls">
+    <button id="betDown" class="small"></button>
+    <button id="spin"></button>
+    <button id="betUp" class="small"></button>
+    <button id="auto"></button>
+    <button id="info" class="small" aria-label="Paytable">ⓘ</button>
+    <button id="settings" class="small" aria-label="Settings">⚙</button>
+  </div>
+  <div id="modal" role="dialog" aria-modal="true"><div class="card" id="modalCard"></div></div>
+  <aside id="qaPanel"></aside>
+  <div id="live" aria-live="polite"></div>
+  <div id="dev"></div>
+  <script type="module" src="./game.js"></script>
+</body>
+</html>
