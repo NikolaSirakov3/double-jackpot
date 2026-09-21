@@ -8,6 +8,7 @@ import {
   createSpinOutcome,
   reelMotion,
   downwardReelTile,
+  reelGridTop,
 } from './game-logic.js';
 
 test('seeded random generator repeats the same sequence', () => {
@@ -84,4 +85,14 @@ test('reel tiles travel downward while the next symbol enters from above', () =>
   assert.deepEqual(downwardReelTile(0.25, 12, -1), { tapeIndex: 11, yInCells: -0.75 });
   assert.deepEqual(downwardReelTile(1.25, 12, 0), { tapeIndex: 11, yInCells: 0.25 });
   assert.deepEqual(downwardReelTile(12, 12, 0), { tapeIndex: 0, yInCells: 0 });
+});
+
+test('reel cabinet clears the jackpot cards in portrait and landscape layouts', () => {
+  const portraitLadderY = 153.75;
+  const landscapeLadderY = 159;
+  const portraitCabinetTop = reelGridTop(portraitLadderY, true) - 28;
+  const landscapeCabinetTop = reelGridTop(landscapeLadderY, false) - 28;
+
+  assert.equal(portraitCabinetTop - (portraitLadderY + 42), 10);
+  assert.equal(landscapeCabinetTop - (landscapeLadderY + 48), 10);
 });

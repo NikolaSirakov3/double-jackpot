@@ -1,5 +1,5 @@
 import { STR } from './strings.js';
-import { CONFIG, PAYLINES, createRng, createSpinOutcome, downwardReelTile, reelMotion, screenFromStops } from './game-logic.js';
+import { CONFIG, PAYLINES, createRng, createSpinOutcome, downwardReelTile, reelGridTop, reelMotion, screenFromStops } from './game-logic.js';
 
 const canvas = document.querySelector('#game');
 const ctx = canvas.getContext('2d', { alpha: false });
@@ -149,7 +149,7 @@ function layout() {
   const logoHeight = logoWidth * 0.5;
   const logoY = portrait ? 24 : 3;
   const ladderY = logoY + logoHeight - 9;
-  const gridTop = Math.max(portrait ? 192 : 214, ladderY + (portrait ? 55 : 60));
+  const gridTop = reelGridTop(ladderY, portrait);
   const verticalRoom = h - gridTop - controlSpace - (portrait ? 116 : 96);
   const sideRoom = portrait ? w - 34 : Math.min(w * 0.44, 560);
   const cell = Math.max(54, Math.min(portrait ? 112 : 128, verticalRoom / 3.2, sideRoom / 3.2));

@@ -43,6 +43,16 @@ export function downwardReelTile(position, travel, row) {
   };
 }
 
+export function reelGridTop(ladderY, portrait) {
+  const ladderHeight = portrait ? 42 : 48;
+  const cabinetTopInset = 28;
+  const clearGap = 10;
+  return Math.max(
+    portrait ? 192 : 214,
+    ladderY + ladderHeight + cabinetTopInset + clearGap,
+  );
+}
+
 export function screenFromStops(stops) {
   return Array.from({ length: 3 }, (_, row) =>
     Array.from({ length: 3 }, (_, reel) => {
