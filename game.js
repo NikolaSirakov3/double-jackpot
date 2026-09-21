@@ -459,7 +459,7 @@ function drawSymbolTile(l, reel, y, symbol, moving = false) {
   tile.addColorStop(1, '#02030e');
   ctx.fillStyle = tile;
   ctx.fillRect(x, y, l.cell, l.cell);
-  const pad = l.cell * 0.135;
+  const pad = l.cell * 0.065;
   if (assets.symbols[symbol]) ctx.drawImage(assets.symbols[symbol], x + pad, y + pad, l.cell - pad * 2, l.cell - pad * 2);
   if (moving) {
     const streak = ctx.createLinearGradient(0, y, 0, y + l.cell);
